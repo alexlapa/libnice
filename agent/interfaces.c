@@ -282,7 +282,7 @@ nice_interfaces_get_local_ips (gboolean include_loopback)
           ifa->ifa_name, IGNORED_IFACE_PREFIX);
       g_free (addr_string);
 #endif
-    } else if (g_str_has_prefix (ifa->ifa_name, "docker0") || g_str_has_prefix (ifa->ifa_name, "br-")) {
+    } else if (g_str_has_prefix (ifa->ifa_name, "docker") || g_str_has_prefix (ifa->ifa_name, "br-")) {
       nice_debug ("Ignoring well known interface %s",
                 ifa->ifa_name);
       g_free (addr_string);
