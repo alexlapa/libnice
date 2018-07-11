@@ -120,9 +120,6 @@ nice_interfaces_get_local_interfaces (void)
     if (ifa->ifa_addr == NULL)
       continue;
 
-    if (strstr(ifa->ifa_name, "eth0") == NULL)
-      continue;
-
     if (ifa->ifa_addr->sa_family == AF_INET || ifa->ifa_addr->sa_family == AF_INET6) {
       nice_debug ("Found interface : %s", ifa->ifa_name);
       interfaces = g_list_prepend (interfaces, g_strdup (ifa->ifa_name));
@@ -285,6 +282,10 @@ nice_interfaces_get_local_ips (gboolean include_loopback)
           ifa->ifa_name, IGNORED_IFACE_PREFIX);
       g_free (addr_string);
 #endif
+    } else if (g_str_has_prefix (ifa->ifa_name, "docker0") || g_str_has_prefix (ifa->ifa_name, "br-")) {
+      nice_debug ("Ignoring well known interface %s",
+                ifa->ifa_name);
+      g_free (addr_string);
     } else {
       if (nice_interfaces_is_private_ip (ifa->ifa_addr))
         ips = add_ip_to_list (ips, addr_string, TRUE);
