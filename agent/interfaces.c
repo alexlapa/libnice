@@ -278,11 +278,11 @@ nice_interfaces_get_local_ips (gboolean include_loopback)
       }
 #ifdef IGNORED_IFACE_PREFIX
     } else if (g_str_has_prefix (ifa->ifa_name, IGNORED_IFACE_PREFIX)) {
-      nice_debug ("Ignoring interface %s as it matches prefix %s",
-          ifa->ifa_name, IGNORED_IFACE_PREFIX);
+      nice_debug ("Ignoring non default interface %s",
+          ifa->ifa_name);
       g_free (addr_string);
 #endif
-    } else if (g_str_has_prefix (ifa->ifa_name, "docker") || g_str_has_prefix (ifa->ifa_name, "br-")) {
+    } else if (!is_default_route(ifa->ifa_name)) {
       nice_debug ("Ignoring well known interface %s",
                 ifa->ifa_name);
       g_free (addr_string);
@@ -301,6 +301,30 @@ nice_interfaces_get_local_ips (gboolean include_loopback)
 
   return ips;
 }
+
+gboolean
+is_default_route(const gchar *interface_name)
+{
+    static const char filename[] = "/proc/net/route";
+    FILE *file = fopen(filename, "r");
+    if (file != NULL) {
+        char line[512];
+
+        while (fgets(line, sizeof line, file) != NULL) {
+            char iface_name[256];
+            unsigned int iface_ip, iface_gw, iface_mask, iface_flags;
+            if (sscanf(line, "%255s %8X %8X %4X %*d %*u %*d %8X", iface_name,
+                       &iface_ip, &iface_gw, &iface_flags, &iface_mask) == 5 && strcmp(interface_name, iface_name) == 0 && iface_mask == 0) {
+                return TRUE;
+            }
+        }
+        fclose(file);
+    } else {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 
 #else /* ! HAVE_GETIFADDRS */
 

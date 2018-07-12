@@ -77,6 +77,13 @@ GList * nice_interfaces_get_local_ips (gboolean include_loopback);
  */
 GList * nice_interfaces_get_local_interfaces (void);
 
+/**
+ * is_default_route:
+ *
+ * Checks if interface is default by parsing `/proc/net/route`.
+ */
+gboolean is_default_route(const gchar *interface_name);
+
 G_END_DECLS
 
 #endif /* __LIBNICE_INTERFACES_H__ */
