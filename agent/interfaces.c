@@ -315,6 +315,7 @@ is_default_route(const gchar *interface_name)
             unsigned int iface_ip, iface_gw, iface_mask, iface_flags;
             if (sscanf(line, "%255s %8X %8X %4X %*d %*u %*d %8X", iface_name,
                        &iface_ip, &iface_gw, &iface_flags, &iface_mask) == 5 && strcmp(interface_name, iface_name) == 0 && iface_mask == 0) {
+                fclose(file);
                 return TRUE;
             }
         }
