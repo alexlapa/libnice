@@ -154,7 +154,6 @@ tests/test-restart
 tests/test-tcp
 tests/test-thread
 tests/test-new-dribble
-tests/test-nomination
 
 # examples/ stuff
 examples/simple-example

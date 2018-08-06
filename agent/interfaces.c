@@ -276,17 +276,11 @@ nice_interfaces_get_local_ips (gboolean include_loopback)
         nice_debug ("Ignoring loopback interface");
         g_free (addr_string);
       }
-#ifdef IGNORED_IFACE_PREFIX
-    } else if (g_str_has_prefix (ifa->ifa_name, IGNORED_IFACE_PREFIX)) {
-      nice_debug ("Ignoring non default interface %s",
-          ifa->ifa_name);
-      g_free (addr_string);
-#endif
     } else if (!is_default_route(ifa->ifa_name)) {
       nice_debug ("Ignoring well known interface %s",
                 ifa->ifa_name);
       g_free (addr_string);
-    } else {
+    }else {
       if (nice_interfaces_is_private_ip (ifa->ifa_addr))
         ips = add_ip_to_list (ips, addr_string, TRUE);
       else

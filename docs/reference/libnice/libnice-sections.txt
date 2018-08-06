@@ -5,7 +5,6 @@ NiceAgent
 NiceComponentState
 NiceComponentType
 NiceProxyType
-NiceNominationMode
 NiceCompatibility
 NiceAgentRecvFunc
 NiceInputMessage
@@ -13,7 +12,6 @@ NiceOutputMessage
 NICE_AGENT_MAX_REMOTE_CANDIDATES
 nice_agent_new
 nice_agent_new_reliable
-nice_agent_new_full
 nice_agent_add_local_address
 nice_agent_set_port_range
 nice_agent_add_stream
@@ -78,7 +76,6 @@ NICE_CANDIDATE_MAX_FOUNDATION
 nice_candidate_new
 nice_candidate_free
 nice_candidate_copy
-nice_candidate_equal_target
 <SUBSECTION Standard>
 NICE_TYPE_CANDIDATE
 nice_candidate_get_type

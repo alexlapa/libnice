@@ -5,8 +5,8 @@ dnl Always compile with -Wall; if --enable-compile-warnings=error is passed,
 dnl also use -Werror. git and pre-releases default to -Werror
 
 dnl use a three digit version number for releases, and four for cvs/prerelease
-AC_INIT([libnice],[0.1.15-dev])
-LIBNICE_RELEASE="no"
+AC_INIT([libnice],[0.1.14])
+LIBNICE_RELEASE="yes"
 
 AC_CANONICAL_TARGET
 
@@ -57,7 +57,6 @@ AC_PROG_CC
 AM_PROG_AR
 LT_PREREQ([2.2.6])
 LT_INIT([dlopen win32-dll disable-static])
-AC_PATH_PROG([GLIB_MKENUMS],[glib-mkenums])
 
 # Check Operating System
 AC_MSG_CHECKING([operating system])
@@ -154,6 +153,7 @@ AS_IF([test "$enable_compile_warnings" = "yes" -o \
 ])
 AS_IF([test "$enable_compile_warnings" = "maximum" -o \
             "$enable_compile_warnings" = "error"],[
+    NICE_ADD_FLAG([-Wswitch-enum])
     NICE_ADD_FLAG([-Wswitch-default])
     NICE_ADD_FLAG([-Waggregate-return])
 ])
@@ -208,11 +208,6 @@ AC_ARG_WITH(gstreamer-0.10,
 	[with_gstreamer010=${withval}],
 	[with_gstreamer010=auto])
 
-AC_ARG_WITH(gstreamer-1.5,
-	AS_HELP_STRING([--with-gstreamer-1.5],[build GStreamer 1.5 plugin]),
-	[with_gstreamer15=${withval}],
-	[with_gstreamer15=auto])
-
 AS_IF([test "$with_gstreamer" != no], [
 
 	PKG_CHECK_MODULES(GST, [
@@ -243,26 +238,6 @@ AS_IF([test "$with_gstreamer" != no], [
 		])
 ])
 
-AS_IF([test "$with_gstreamer15" != no], [
-
-	PKG_CHECK_MODULES(GST15, [
-		gstreamer-1.5 >= 1.5
-		gstreamer-base-1.5 >= 1.5
-		],
-		[
-		with_gstreamer15=yes
-		GST_MAJORMINOR=1.5
-		gstplugin15dir="\$(libdir)/gstreamer-$GST_MAJORMINOR"
-		],
-		[
-		AS_IF([test "$with_gstreamer" = yes], [
-			AC_MSG_ERROR([GStreamer 1.5 support was requested but GStreamer 1.5 libraries are not available])
-		])
-
-		with_gstreamer15=no
-		])
-])
-
 AS_IF([test "$with_gstreamer010" != no], [
   
 	PKG_CHECK_MODULES(GST010, [
@@ -284,10 +259,8 @@ AS_IF([test "$with_gstreamer010" != no], [
 ])
 
 AC_SUBST(gstplugindir)
-AC_SUBST(gstplugin15dir)
 AC_SUBST(gstplugin010dir)
 
-AM_CONDITIONAL(WITH_GSTREAMER15, test "$with_gstreamer15" = yes)
 AM_CONDITIONAL(WITH_GSTREAMER, test "$with_gstreamer" = yes)
 AM_CONDITIONAL(HAVE_GST_CHECK, test "$have_gst_check" = yes)
 AM_CONDITIONAL(WITH_GSTREAMER010, test "$with_gstreamer010" = yes)
@@ -380,20 +353,6 @@ AM_CONDITIONAL([ENABLE_GTK_DOC], false)
 
 # GObject introspection
 GOBJECT_INTROSPECTION_CHECK([1.30.0])
-
-dnl Ignore a specific network interface name prefix from the connection check
-AC_MSG_CHECKING([whether to ignore a specific network interface name prefix])
-AC_ARG_WITH([ignored-network-interface-prefix],
-  [AS_HELP_STRING([--with-ignored-network-interface-prefix=string],
-    [Ignore network interfaces whose name starts with "string" from the ICE connection
-     check algorithm. For example, interfaces "virbr" in the case of the virtual bridge
-     handled by libvirtd, do not help in finding connectivity.])],
-    [interface_prefix="$withval"])
-AS_IF([test -n "$interface_prefix"],
-  [AC_DEFINE_UNQUOTED([IGNORED_IFACE_PREFIX],["$interface_prefix"],
-    [Ignore this network interface prefix from the connection check])
-   AC_MSG_RESULT([yes, $interface_prefix])],
-  [AC_MSG_RESULT([no])])
 
 AC_CONFIG_MACRO_DIR(m4)
 

@@ -174,8 +174,8 @@ priv_send_data_queue_destroy (gpointer user_data)
 
 NiceSocket *
 nice_udp_turn_socket_new (GMainContext *ctx, NiceAddress *addr,
-    NiceSocket *base_socket, const NiceAddress *server_addr,
-    const gchar *username, const gchar *password,
+    NiceSocket *base_socket, NiceAddress *server_addr,
+    gchar *username, gchar *password,
     NiceTurnSocketCompatibility compatibility)
 {
   UdpTurnPriv *priv;
@@ -406,8 +406,9 @@ socket_recv_messages (NiceSocket *sock,
 
     /* Split up the monolithic buffer again into the caller-provided buffers. */
     if (parsed_buffer_length > 0 && allocated_buffer) {
-      memcpy_buffer_to_input_message (message, buffer,
-          parsed_buffer_length);
+      parsed_buffer_length =
+          memcpy_buffer_to_input_message (message, buffer,
+              parsed_buffer_length);
     }
 
     if (allocated_buffer)
@@ -1184,7 +1185,7 @@ nice_udp_turn_socket_parse_recv_message (NiceSocket *sock, NiceSocket **from_soc
 gsize
 nice_udp_turn_socket_parse_recv (NiceSocket *sock, NiceSocket **from_sock,
     NiceAddress *from, gsize len, guint8 *buf,
-    const NiceAddress *recv_from, const guint8 *_recv_buf, gsize recv_len)
+    NiceAddress *recv_from, guint8 *_recv_buf, gsize recv_len)
 {
 
   UdpTurnPriv *priv = (UdpTurnPriv *) sock->priv;
@@ -1194,8 +1195,8 @@ nice_udp_turn_socket_parse_recv (NiceSocket *sock, NiceSocket **from_sock,
   ChannelBinding *binding = NULL;
 
   union {
-    const guint8 *u8;
-    const guint16 *u16;
+    guint8 *u8;
+    guint16 *u16;
   } recv_buf;
 
   /* In the case of a reliable UDP-TURN-OVER-TCP (which means MS-TURN)
